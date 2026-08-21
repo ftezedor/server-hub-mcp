@@ -1,0 +1,9 @@
+*.db          # Ignores all files with .db extension (SQLite databases, etc.)
+*.sh          # Ignores all .sh shell script files
+*.zip         # Ignores all .zip archives
+
+__pycache__   # Ignores Python bytecode cache directories
+venv          # Ignores Python virtual environment directory
+/.env         # Ignores .env file ONLY in the root directory
+
+TODO          # Ignores a file/folder literally named "TODO"
