@@ -1,6 +1,6 @@
 # init_db.py (versão melhorada)
 from database import init_database, create_server, add_metrics, create_alert, get_server_by_name
-from models import Server, ServerMetrics, ServerAlert
+from app.mcp.models import Server, ServerMetrics, ServerAlert
 import random
 
 def seed_database():

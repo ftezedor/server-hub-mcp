@@ -1,0 +1,1 @@
+"""Server Hub REST application."""

@@ -1,9 +1,31 @@
-*.db          # Ignores all files with .db extension (SQLite databases, etc.)
-*.sh          # Ignores all .sh shell script files
-*.zip         # Ignores all .zip archives
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
 
-__pycache__   # Ignores Python bytecode cache directories
-venv          # Ignores Python virtual environment directory
-/.env         # Ignores .env file ONLY in the root directory
+# Virtual environments
+.venv/
+venv/
 
-TODO          # Ignores a file/folder literally named "TODO"
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# SQLite / local databases
+*.db
+*.db-shm
+*.db-wal
+
+# Local development
+/trash/
+
+# Archives / generated packages
+*.zip
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+TODO

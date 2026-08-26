@@ -1,46 +1,63 @@
-import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
-import mcp_server
+import app.mcp.server as server
 
 
-class TestGetActiveAlerts(unittest.TestCase):
-    @patch.object(mcp_server.client, "get_server_by_id")
-    @patch.object(mcp_server.client, "get_alerts")
-    def test_active_alerts_hide_ids(self, mock_alerts, mock_server):
-        mock_alerts.return_value = {
-            "alerts": [{
+def test_active_alerts_use_server_reference_from_backend():
+    alerts = {
+        "alerts": [
+            {
                 "id": 42,
-                "server_id": 1,
+                "server": "web-server-01",
+                "server_ip": "192.168.1.10",
                 "severity": "critical",
                 "message": "High CPU usage",
                 "created_at": "2026-08-18T18:00:00",
-            }]
-        }
-        mock_server.return_value = {
-            "id": 1,
-            "name": "web-server-01",
-            "ip": "192.168.1.10",
-        }
+            }
+        ]
+    }
 
-        result = mcp_server.get_active_alerts()
+    with patch.object(server.client, "get_alerts", return_value=alerts) as mock_alerts, \
+         patch.object(server.client, "search", side_effect=AssertionError("unexpected search")), \
+         patch.object(server.client, "get_server_by_id", side_effect=AssertionError("unexpected server lookup")):
+        result = server.get_active_alerts()
 
-        self.assertEqual(result["count"], 1)
-        alert = result["alerts"][0]
-        self.assertEqual(alert["server"]["name"], "web-server-01")
-        self.assertEqual(alert["severity"], "critical")
-        self.assertNotIn("id", alert)
-        self.assertNotIn("server_id", alert)
-        mock_server.assert_called_once_with(1)
-
-    @patch.object(mcp_server.client, "get_alerts")
-    def test_no_active_alerts(self, mock_alerts):
-        mock_alerts.return_value = {"alerts": []}
-
-        result = mcp_server.get_active_alerts()
-
-        self.assertEqual(result, {"alerts": [], "count": 0})
+    assert result.count == 1
+    alert = result.alerts[0]
+    assert alert.server.name == "web-server-01"
+    assert alert.server.ip == "192.168.1.10"
+    assert alert.severity == "critical"
+    assert alert.message == "High CPU usage"
+    assert result.warnings == []
+    mock_alerts.assert_called_once_with()
 
 
-if __name__ == "__main__":
-    unittest.main()
+def test_active_alerts_warn_when_server_reference_is_incomplete():
+    alerts = {
+        "alerts": [
+            {
+                "id": 42,
+                "server": "web-server-01",
+                "severity": "critical",
+                "message": "High CPU usage",
+                "created_at": "2026-08-18T18:00:00",
+            }
+        ]
+    }
+
+    with patch.object(server.client, "get_alerts", return_value=alerts):
+        result = server.get_active_alerts()
+
+    assert result.count == 1
+    assert result.alerts[0].server is None
+    assert len(result.warnings) == 1
+    assert result.warnings[0].type == "server_reference_incomplete"
+
+
+def test_no_active_alerts():
+    with patch.object(server.client, "get_alerts", return_value={"alerts": []}):
+        result = server.get_active_alerts()
+
+    assert result.alerts == []
+    assert result.count == 0
+    assert result.warnings == []
