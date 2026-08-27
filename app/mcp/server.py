@@ -7,7 +7,7 @@ directly; both implementations satisfy the same client port.
 
 from __future__ import annotations
 
-import os, inspect
+import os, json
 from typing import Annotated, Any, Literal, cast
 
 from fastmcp import FastMCP
@@ -140,6 +140,130 @@ def _resolve_server(identifier: str) -> dict[str, Any]:
     return exact[0]
 
 
+# MCP resources
+@mcp.resource(
+    "server://{server}/details",
+    name="server_details",
+    description="Detailed information about a server.",
+    mime_type="application/json",
+)
+def server_details_resource(server: str) -> str:
+    """Read detailed information about one server."""
+    resolved = _resolve_server(server)
+
+    data = client.get_server_by_id(resolved["id"])
+
+    return json.dumps(
+        _clean_server(data),
+        ensure_ascii=False,
+    )
+
+
+@mcp.resource(
+    "server://{server}/metrics",
+    name="server_metrics",
+    description="Recent metrics for a server.",
+    mime_type="application/json",
+)
+def server_metrics_resource(server: str) -> str:
+    """Read recent metrics for one server."""
+    resolved = _resolve_server(server)
+
+    data = client.get_metrics(resolved["id"], 10)
+
+    payload = {
+        "server": {
+            "name": data.get("server", {}).get(
+                "name",
+                resolved["name"],
+            ),
+            "ip": resolved["ip"],
+        },
+        "metrics": [
+            _clean_metrics(metric)
+            for metric in data.get("metrics", [])
+        ],
+        "count": data.get("count", 0),
+    }
+
+    return json.dumps(
+        payload,
+        ensure_ascii=False,
+    )
+
+
+@mcp.resource(
+    "server://{server}/alerts",
+    name="server_alerts",
+    description="Active alerts for a server.",
+    mime_type="application/json",
+)
+def server_alerts_resource(server: str) -> str:
+    """Read active alerts for one server."""
+    resolved = _resolve_server(server)
+
+    data = client.get_alerts()
+
+    alerts = [
+        alert
+        for alert in data.get("alerts", [])
+        if alert.get("server") == resolved["name"]
+        or alert.get("server_ip") == resolved["ip"]
+    ]
+
+    payload = {
+        "server": {
+            "name": resolved["name"],
+            "ip": resolved["ip"],
+        },
+        "alerts": alerts,
+        "count": len(alerts),
+    }
+
+    return json.dumps(
+        payload,
+        ensure_ascii=False,
+    )
+
+@mcp.resource(
+    "servers://active",
+    name="active_servers",
+    description="List all currently active servers.",
+    mime_type="application/json",
+)
+def active_servers_resource() -> str:
+    """Read the currently active servers."""
+    data = client.list_servers()
+
+    servers = [
+        _clean_server_summary(server)
+        for server in data.get("results", [])
+        if server.get("status") == "active"
+    ]
+
+    return json.dumps(
+        {
+            "servers": servers,
+            "count": len(servers),
+        },
+        ensure_ascii=False,
+    )
+
+
+@mcp.resource(
+    "system://stats",
+    name="system_stats",
+    description="Current aggregate system statistics.",
+    mime_type="application/json",
+)
+def system_stats_resource() -> str:
+    """Read aggregate system statistics."""
+    return json.dumps(
+        client.get_stats(),
+        ensure_ascii=False,
+    )
+
+# MCP tools
 @mcp.tool()
 def search_servers(query: str) -> SearchServersResponse:
     """Search for servers by partial name or IP address.
