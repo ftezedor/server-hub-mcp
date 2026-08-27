@@ -50,8 +50,16 @@ class AppServerHubClient:
             cpu_cores=server.cpu_cores,
             memory_gb=server.memory_gb,
             disk_gb=server.disk_gb,
-            last_updated=server.last_updated,
-            created_at=server.created_at,
+            last_updated=(
+                server.last_updated.isoformat()
+                if server.last_updated is not None
+                else None
+            ),
+            created_at=(
+                server.created_at.isoformat()
+                if server.created_at is not None
+                else None
+            ),
         )
 
     @staticmethod
@@ -62,7 +70,28 @@ class AppServerHubClient:
             disk_usage_percent=metrics.disk_usage_percent,
             temperature_celsius=metrics.temperature_celsius,
             uptime_seconds=metrics.uptime_seconds,
-            timestamp=metrics.timestamp,
+            timestamp=(
+                metrics.timestamp.isoformat()
+                if metrics.timestamp is not None
+                else None
+            ),
+        )
+
+    @staticmethod
+    def _alert_data(view: Any) -> AlertData:
+        return AlertData(
+            id=view.id,
+            server=view.server,
+            server_ip=view.server_ip,
+            severity=view.severity.value,
+            message=view.message,
+            resolved=view.resolved,
+            created_at=view.created_at.isoformat(),
+            resolved_at=(
+                view.resolved_at.isoformat()
+                if view.resolved_at is not None
+                else None
+            ),
         )
 
     def search(self, query: str) -> SearchData:
@@ -71,17 +100,11 @@ class AppServerHubClient:
 
             return SearchData(
                 query=query,
-                results=[
-                    self._server_data(server)
-                    for server in servers
-                ],
+                results=[self._server_data(server) for server in servers],
                 count=len(servers),
             )
 
-    def get_server_by_id(
-        self,
-        server_id: int,
-    ) -> ServerDetailsData:
+    def get_server_by_id(self, server_id: int) -> ServerDetailsData:
         with self._services() as dep:
             server = dep["servers"].get_server(server_id)
             metrics = dep["metrics"].latest(server_id)
@@ -95,24 +118,14 @@ class AppServerHubClient:
                 ),
             )
 
-    def get_metrics(
-        self,
-        server_id: int,
-        limit: int,
-    ) -> ServerMetricsData:
+    def get_metrics(self, server_id: int, limit: int) -> ServerMetricsData:
         with self._services() as dep:
             server = dep["servers"].get_server(server_id)
             metrics = dep["metrics"].history(server_id, limit)
 
             return ServerMetricsData(
-                server=ServerReferenceData(
-                    id=server.id,
-                    name=server.name,
-                ),
-                metrics=[
-                    self._metrics_data(metric)
-                    for metric in metrics
-                ],
+                server=ServerReferenceData(id=server.id, name=server.name),
+                metrics=[self._metrics_data(metric) for metric in metrics],
                 count=len(metrics),
             )
 
@@ -121,27 +134,13 @@ class AppServerHubClient:
             views = dep["alerts"].active()
 
             return AlertsData(
-                alerts=[
-                    AlertData(
-                        id=view.id,
-                        server=view.server,
-                        server_ip=view.server_ip,
-                        severity=view.severity.value,
-                        message=view.message,
-                        resolved=view.resolved,
-                        created_at=view.created_at,
-                        resolved_at=view.resolved_at,
-                    )
-                    for view in views
-                ],
+                alerts=[self._alert_data(view) for view in views],
                 total=len(views),
             )
 
     def get_stats(self) -> StatsData:
         with self._services() as dep:
-            return StatsData.model_validate(
-                dep["system"].stats()
-            )
+            return StatsData.model_validate(dep["system"].stats())
 
     def create_alert(
         self,
@@ -159,7 +158,11 @@ class AppServerHubClient:
             return CreateAlertData(
                 id=alert.id,
                 message="Alerta criado com sucesso",
-                created_at=alert.created_at,
+                created_at=(
+                    alert.created_at.isoformat()
+                    if alert.created_at is not None
+                    else None
+                ),
             )
 
     def list_servers(self) -> ServerListData:
@@ -167,9 +170,6 @@ class AppServerHubClient:
             servers = dep["servers"].list_servers()
 
             return ServerListData(
-                servers=[
-                    self._server_data(server)
-                    for server in servers
-                ],
+                servers=[self._server_data(server) for server in servers],
                 total=len(servers),
             )

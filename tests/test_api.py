@@ -55,6 +55,22 @@ def test_root(api):
     assert data["docs"] == "/docs"
 
 
+def test_health(api):
+    data = assert_json(api.get("/health"), 200)
+
+    assert data == {
+        "status": "healthy",
+    }
+
+
+def test_readiness(api):
+    data = assert_json(api.get("/ready"), 200)
+
+    assert data == {
+        "status": "ready",
+    }
+
+
 @pytest.mark.parametrize("path", ["/docs", "/redoc", "/openapi.json"])
 def test_api_metadata(api, path):
     response = api.get(path)

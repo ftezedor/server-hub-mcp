@@ -19,7 +19,7 @@ def test_active_alerts_use_server_reference_from_backend():
                 resolved=False,
                 created_at=datetime.fromisoformat(
                     "2026-08-18T18:00:00"
-                ),
+                ).isoformat(),
             )
         ],
         total=1,
@@ -70,7 +70,7 @@ def test_active_alerts_warn_when_server_reference_is_incomplete():
                 resolved=False,
                 created_at=datetime.fromisoformat(
                     "2026-08-18T18:00:00"
-                ),
+                ).isoformat(),
             )
         ],
         total=1,

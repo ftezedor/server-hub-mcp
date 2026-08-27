@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from datetime import datetime
 from typing import Literal
 
 from pydantic import BaseModel
@@ -18,8 +17,8 @@ class ServerData(BaseModel):
     cpu_cores: int
     memory_gb: float
     disk_gb: float
-    last_updated: datetime | None = None
-    created_at: datetime | None = None
+    last_updated: str | None = None
+    created_at: str | None = None
 
 
 class ServerDetailsData(ServerData):
@@ -37,7 +36,7 @@ class MetricsData(BaseModel):
     disk_usage_percent: float
     temperature_celsius: float | None = None
     uptime_seconds: int
-    timestamp: datetime | None = None
+    timestamp: str | None = None
 
 
 class ServerMetricsData(BaseModel):
@@ -53,8 +52,8 @@ class AlertData(BaseModel):
     severity: Severity
     message: str
     resolved: bool
-    created_at: datetime
-    resolved_at: datetime | None = None
+    created_at: str
+    resolved_at: str | None = None
 
 
 class AlertsData(BaseModel):
@@ -65,7 +64,7 @@ class AlertsData(BaseModel):
 class CreateAlertData(BaseModel):
     id: int
     message: str
-    created_at: datetime | None = None
+    created_at: str | None = None
 
 
 class ServerListData(BaseModel):
