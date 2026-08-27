@@ -7,7 +7,8 @@ directly; both implementations satisfy the same client port.
 
 from __future__ import annotations
 
-import os, json
+import json
+import os
 from typing import Annotated, Any, Literal, cast
 
 from fastmcp import FastMCP
@@ -17,6 +18,7 @@ from app.mcp.adapters import (
     AppServerHubClient,
     RestServerHubClient,
 )
+from app.mcp.contracts import ServerData
 from app.mcp.models import (
     ActiveAlertsResponse,
     Alert,
@@ -39,7 +41,6 @@ VALID_SEVERITIES = {"critical", "warning", "info"}
 
 
 def _build_client() -> ServerHubClient:
-    
     backend = os.getenv("SERVER_HUB_MCP_BACKEND", "rest").strip().lower()
 
     if backend == "rest":
@@ -56,58 +57,34 @@ def _build_client() -> ServerHubClient:
 client: ServerHubClient = _build_client()
 
 
-def _clean_server_summary(server: dict[str, Any]) -> dict[str, Any]:
-    """Return MCP-facing server data without persistence IDs."""
-    allowed = ("name", "ip", "environment", "status")
+def _clean_server_summary(server: ServerData) -> dict[str, Any]:
+    """Return MCP-facing server data without the persistence ID."""
     return {
-        key: server[key]
-        for key in allowed
-        if key in server
+        "name": server.name,
+        "ip": server.ip,
+        "environment": server.environment,
+        "status": server.status,
     }
 
 
-def _clean_server(server: dict[str, Any]) -> dict[str, Any]:
-    """Return MCP-facing server data without persistence IDs."""
-    allowed = (
-        "name",
-        "ip",
-        "environment",
-        "status",
-        "cpu_cores",
-        "memory_gb",
-        "disk_gb",
-        "last_updated",
-        "created_at",
-    )
-    result = {
-        key: server[key]
-        for key in allowed
-        if key in server
+def _clean_server(server: ServerData) -> dict[str, Any]:
+    """Return MCP-facing server data without the persistence ID."""
+    result: dict[str, Any] = {
+        "name": server.name,
+        "ip": server.ip,
+        "environment": server.environment,
+        "status": server.status,
+        "cpu_cores": server.cpu_cores,
+        "memory_gb": server.memory_gb,
+        "disk_gb": server.disk_gb,
+        "last_updated": server.last_updated,
+        "created_at": server.created_at,
     }
-
-    if server.get("metrics") is not None:
-        result["metrics"] = _clean_metrics(server["metrics"])
 
     return result
 
 
-def _clean_metrics(metrics: dict[str, Any]) -> dict[str, Any]:
-    allowed = (
-        "cpu_usage_percent",
-        "memory_usage_percent",
-        "disk_usage_percent",
-        "temperature_celsius",
-        "uptime_seconds",
-        "timestamp",
-    )
-    return {
-        key: metrics[key]
-        for key in allowed
-        if key in metrics
-    }
-
-
-def _resolve_server(identifier: str) -> dict[str, Any]:
+def _resolve_server(identifier: str) -> ServerData:
     """Resolve an exact server name or exact IP address.
 
     The client port intentionally exposes the persistence ID internally to
@@ -120,13 +97,11 @@ def _resolve_server(identifier: str) -> dict[str, Any]:
         raise ValueError("server must not be empty")
 
     data = client.search(identifier)
-    results = data.get("results", [])
 
     exact = [
         server
-        for server in results
-        if server.get("name") == identifier
-        or server.get("ip") == identifier
+        for server in data.results
+        if server.name == identifier or server.ip == identifier
     ]
 
     if not exact:
@@ -141,6 +116,8 @@ def _resolve_server(identifier: str) -> dict[str, Any]:
 
 
 # MCP resources
+
+
 @mcp.resource(
     "server://{server}/details",
     name="server_details",
@@ -151,11 +128,12 @@ def server_details_resource(server: str) -> str:
     """Read detailed information about one server."""
     resolved = _resolve_server(server)
 
-    data = client.get_server_by_id(resolved["id"])
+    data = client.get_server_by_id(resolved.id)
 
     return json.dumps(
         _clean_server(data),
         ensure_ascii=False,
+        default=str,
     )
 
 
@@ -169,21 +147,18 @@ def server_metrics_resource(server: str) -> str:
     """Read recent metrics for one server."""
     resolved = _resolve_server(server)
 
-    data = client.get_metrics(resolved["id"], 10)
+    data = client.get_metrics(resolved.id, 10)
 
     payload = {
         "server": {
-            "name": data.get("server", {}).get(
-                "name",
-                resolved["name"],
-            ),
-            "ip": resolved["ip"],
+            "name": data.server.name,
+            "ip": resolved.ip,
         },
         "metrics": [
-            _clean_metrics(metric)
-            for metric in data.get("metrics", [])
+            metric.model_dump(mode="json")
+            for metric in data.metrics
         ],
-        "count": data.get("count", 0),
+        "count": data.count,
     }
 
     return json.dumps(
@@ -205,16 +180,16 @@ def server_alerts_resource(server: str) -> str:
     data = client.get_alerts()
 
     alerts = [
-        alert
-        for alert in data.get("alerts", [])
-        if alert.get("server") == resolved["name"]
-        or alert.get("server_ip") == resolved["ip"]
+        alert.model_dump(mode="json")
+        for alert in data.alerts
+        if alert.server == resolved.name
+        or alert.server_ip == resolved.ip
     ]
 
     payload = {
         "server": {
-            "name": resolved["name"],
-            "ip": resolved["ip"],
+            "name": resolved.name,
+            "ip": resolved.ip,
         },
         "alerts": alerts,
         "count": len(alerts),
@@ -224,6 +199,7 @@ def server_alerts_resource(server: str) -> str:
         payload,
         ensure_ascii=False,
     )
+
 
 @mcp.resource(
     "servers://active",
@@ -237,8 +213,8 @@ def active_servers_resource() -> str:
 
     servers = [
         _clean_server_summary(server)
-        for server in data.get("results", [])
-        if server.get("status") == "active"
+        for server in data.servers
+        if server.status == "active"
     ]
 
     return json.dumps(
@@ -259,11 +235,14 @@ def active_servers_resource() -> str:
 def system_stats_resource() -> str:
     """Read aggregate system statistics."""
     return json.dumps(
-        client.get_stats(),
+        client.get_stats().model_dump(mode="json"),
         ensure_ascii=False,
     )
 
+
 # MCP tools
+
+
 @mcp.tool()
 def search_servers(query: str) -> SearchServersResponse:
     """Search for servers by partial name or IP address.
@@ -283,7 +262,7 @@ def search_servers(query: str) -> SearchServersResponse:
         query=query,
         servers=[
             ServerSummary(**_clean_server_summary(server))
-            for server in data.get("results", [])
+            for server in data.results
         ],
     )
 
@@ -299,7 +278,7 @@ def get_server(server: str) -> ServerDetails:
 
     return ServerDetails(
         **_clean_server(
-            client.get_server_by_id(resolved["id"])
+            client.get_server_by_id(resolved.id)
         )
     )
 
@@ -318,21 +297,18 @@ def get_server_metrics(
         raise ValueError("limit must be between 1 and 50")
 
     resolved = _resolve_server(server)
-    data = client.get_metrics(resolved["id"], limit)
+    data = client.get_metrics(resolved.id, limit)
 
     return GetServerMetricsResponse(
         server=ServerReference(
-            name=data.get("server", {}).get(
-                "name",
-                resolved["name"],
-            ),
-            ip=resolved["ip"],
+            name=data.server.name,
+            ip=resolved.ip,
         ),
         metrics=[
-            Metrics(**_clean_metrics(metric))
-            for metric in data.get("metrics", [])
+            Metrics.model_validate(metric.model_dump())
+            for metric in data.metrics
         ],
-        count=data.get("count", 0),
+        count=data.count,
     )
 
 
@@ -347,32 +323,30 @@ def get_active_alerts() -> ActiveAlertsResponse:
     alerts = []
     warnings = []
 
-    for raw_alert in data.get("alerts", []):
-        server_name = raw_alert.get("server")
-        server_ip = raw_alert.get("server_ip")
-
-        if not server_name or not server_ip:
+    for raw_alert in data.alerts:
+        if not raw_alert.server or not raw_alert.server_ip:
             warnings.append(
                 ToolWarning(
                     type="server_reference_incomplete",
-                    message=(
-                        "Alert is missing server name or IP address"
-                    ),
+                    message="Alert is missing server name or IP address",
                 )
             )
 
         server_ref = (
-            ServerReference(name=server_name, ip=server_ip)
-            if server_name and server_ip
+            ServerReference(
+                name=raw_alert.server,
+                ip=raw_alert.server_ip,
+            )
+            if raw_alert.server and raw_alert.server_ip
             else None
         )
 
         alerts.append(
             Alert(
                 server=server_ref,
-                severity=raw_alert["severity"],
-                message=raw_alert["message"],
-                created_at=raw_alert["created_at"],
+                severity=raw_alert.severity,
+                message=raw_alert.message,
+                created_at=raw_alert.created_at.isoformat(),
             )
         )
 
@@ -389,7 +363,9 @@ def get_system_stats() -> SystemStatsResponse:
 
     Returns server counts by status and active alert counts by severity.
     """
-    return SystemStatsResponse(**client.get_stats())
+    return SystemStatsResponse(
+        **client.get_stats().model_dump()
+    )
 
 
 @mcp.tool()
@@ -421,8 +397,9 @@ def create_alert(
     )
 
     resolved = _resolve_server(server)
+
     result = client.create_alert(
-        resolved["name"],
+        resolved.name,
         severity,
         message,
     )
@@ -430,12 +407,16 @@ def create_alert(
     return CreateAlertResponse(
         created=True,
         server=ServerReference(
-            name=resolved["name"],
-            ip=resolved["ip"],
+            name=resolved.name,
+            ip=resolved.ip,
         ),
         severity=severity,
         message=message,
-        created_at=result.get("created_at"),
+        created_at=(
+            result.created_at.isoformat()
+            if result.created_at is not None
+            else None
+        ),
     )
 
 

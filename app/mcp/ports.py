@@ -1,7 +1,17 @@
 from __future__ import annotations
 
-from typing import Any, Protocol
+from typing import Protocol
 
+from app.mcp.contracts import (
+    AlertsData,
+    CreateAlertData,
+    SearchData,
+    ServerData,
+    ServerDetailsData,
+    ServerListData,
+    ServerMetricsData,
+    StatsData,
+)
 
 class ServerHubClient(Protocol):
     """Backend port used by MCP tools.
@@ -10,21 +20,21 @@ class ServerHubClient(Protocol):
     layer. The MCP tools depend only on this contract.
     """
 
-    def search(self, query: str) -> dict[str, Any]: ...
+    def search(self, query: str) -> SearchData: ...
 
-    def get_server_by_id(self, server_id: int) -> dict[str, Any]: ...
+    def get_server_by_id(self, server_id: int) -> ServerDetailsData: ...
 
-    def get_metrics(self, server_id: int, limit: int) -> dict[str, Any]: ...
+    def get_metrics(self, server_id: int, limit: int) -> ServerMetricsData: ...
 
-    def get_alerts(self) -> dict[str, Any]: ...
+    def get_alerts(self) -> AlertsData: ...
 
-    def get_stats(self) -> dict[str, Any]: ...
+    def get_stats(self) -> StatsData: ...
 
     def create_alert(
         self,
         server: str,
         severity: str,
         message: str,
-    ) -> dict[str, Any]: ...
+    ) -> CreateAlertData: ...
 
-    def list_servers(self) -> dict[str, Any]: ...
+    def list_servers(self) -> ServerListData: ...

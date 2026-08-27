@@ -124,27 +124,28 @@ def test_application_client_matches_rest_contract_shape(monkeypatch):
     client = AppServerHubClient()
 
     search = client.search("web")
-    assert search["results"][0]["id"] == 1
-    assert search["results"][0]["name"] == "web-server-01"
+    assert search.results[0].id == 1
+    assert search.results[0].name == "web-server-01"
 
     server = client.get_server_by_id(1)
-    assert server["name"] == "web-server-01"
-    assert server["metrics"]["cpu_usage_percent"] == 82.4
+    assert server.name == "web-server-01"
+    assert server.metrics is not None
+    assert server.metrics.cpu_usage_percent == 82.4
 
     metrics = client.get_metrics(1, 5)
-    assert metrics["server"]["name"] == "web-server-01"
-    assert metrics["count"] == 1
+    assert metrics.server.name == "web-server-01"
+    assert metrics.count == 1
 
     alerts = client.get_alerts()
-    assert alerts["alerts"][0]["server"] == "web-server-01"
+    assert alerts.alerts[0].server == "web-server-01"
 
     stats = client.get_stats()
-    assert stats["active_alerts"] == 1
+    assert stats.active_alerts == 1
 
     created = client.create_alert(
         "web-server-01",
         "critical",
         "Test",
     )
-    assert created["id"] == 8
-    assert created["created_at"] is not None
+    assert created.id == 8
+    assert created.created_at is not None

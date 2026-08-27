@@ -127,14 +127,15 @@ def test_application_adapter_exposes_backend_contract(monkeypatch):
     stats = client.get_stats()
     created = client.create_alert("web-server-01", "critical", "Test")
 
-    assert search["count"] == 1
-    assert search["results"][0]["name"] == "web-server-01"
-    assert server["metrics"]["cpu_usage_percent"] == 82.4
-    assert metrics["count"] == 1
-    assert alerts["total"] == 1
-    assert alerts["alerts"][0]["server"] == "web-server-01"
-    assert stats["active_alerts"] == 1
-    assert created["id"] == 8
+    assert search.count == 1
+    assert search.results[0].name == "web-server-01"
+    assert server.metrics is not None
+    assert server.metrics.cpu_usage_percent == 82.4
+    assert metrics.count == 1
+    assert alerts.total == 1
+    assert alerts.alerts[0].server == "web-server-01"
+    assert stats.active_alerts == 1
+    assert created.id == 8
 
 
 def test_rest_adapter_builds_expected_request(monkeypatch):
@@ -159,7 +160,7 @@ def test_rest_adapter_builds_expected_request(monkeypatch):
     client = RestServerHubClient("http://localhost:8080/api", timeout=3)
     result = client.create_alert("web-server-01", "warning", "High CPU")
 
-    assert result["id"] == 10
+    assert result.id == 10
     assert captured == {
         "method": "POST",
         "url": "http://localhost:8080/api/alerts",
