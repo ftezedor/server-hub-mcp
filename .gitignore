@@ -28,4 +28,6 @@ venv/
 .vscode/
 .idea/
 
+# leftovers
 TODO
+server_hub.egg-info/
