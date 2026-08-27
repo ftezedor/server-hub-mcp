@@ -94,3 +94,6 @@ class RestServerHubClient:
                 "message": message,
             },
         )
+
+    def list_servers(self) -> dict[str, Any]:
+        return self._request("GET", "/servers")

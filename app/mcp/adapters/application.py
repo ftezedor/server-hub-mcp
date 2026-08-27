@@ -163,3 +163,14 @@ class AppServerHubClient:
                     else None
                 ),
             }
+
+    def list_servers(self) -> dict[str, Any]:
+        with self._services() as dep:
+            servers = dep["servers"].list_servers()
+            return {
+                "servers": [
+                    self._server_dict(server)
+                    for server in servers
+                ],
+                "total": len(servers),
+            }
