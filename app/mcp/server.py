@@ -56,6 +56,14 @@ def _build_client() -> ServerHubClient:
 
 client: ServerHubClient = _build_client()
 
+def _as_mcp_timestamp(value: Any) -> str | None:
+    if value is None:
+        return None
+
+    if hasattr(value, "isoformat"):
+        return value.isoformat()
+
+    return str(value)
 
 def _clean_server_summary(server: ServerData) -> dict[str, Any]:
     """Return MCP-facing server data without the persistence ID."""
@@ -81,6 +89,11 @@ def _clean_server(server: ServerData) -> dict[str, Any]:
         "created_at": server.created_at,
     }
 
+    metrics = getattr(server, "metrics", None)
+
+    if metrics is not None:
+        result["metrics"] = metrics.model_dump(mode="json")
+        
     return result
 
 
@@ -346,7 +359,7 @@ def get_active_alerts() -> ActiveAlertsResponse:
                 server=server_ref,
                 severity=raw_alert.severity,
                 message=raw_alert.message,
-                created_at=raw_alert.created_at.isoformat(),
+                created_at=raw_alert.created_at,
             )
         )
 
@@ -413,7 +426,7 @@ def create_alert(
         severity=severity,
         message=message,
         created_at=(
-            result.created_at.isoformat()
+            result.created_at
             if result.created_at is not None
             else None
         ),

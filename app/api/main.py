@@ -13,6 +13,7 @@ from app.api.routes import (
     search_router,
     servers_router,
     stats_router,
+    health_router,
 )
 
 from app.api.handlers.exception_handlers import (
@@ -31,6 +32,7 @@ tags_metadata = [
     {"name": "Alerts", "description": "Gerenciamento de alertas do sistema"},
     {"name": "Search", "description": "Pesquisa de servidores"},
     {"name": "System", "description": "Estatísticas agregadas do sistema"},
+    {"name": "Health", "description": "Status de saída do sistema"},
 ]
 
 
@@ -61,6 +63,7 @@ app.include_router(metrics_router)
 app.include_router(alerts_router)
 app.include_router(search_router)
 app.include_router(stats_router)
+app.include_router(health_router)
 
 
 @app.get("/", tags=["Root"])
