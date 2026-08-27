@@ -86,7 +86,7 @@ The implementation is organized around application/domain logic and interface ad
 
 ## Documentation
 
-Additional architecture and decision records can be added under `docs/` as the project evolves.
+Architecture documentation and Architecture Decision Records (ADRs) are available under `docs/`.
 
 ## Development
 
@@ -111,4 +111,4 @@ The repository also contains scripts/components for running the REST and MCP ser
 
 ## License
 
-No license is specified in the current project materials.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
