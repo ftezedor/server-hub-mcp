@@ -22,6 +22,9 @@ class AlertService:
     ) -> ServerAlert:
         server_entity = self.servers.find_by_identifier(server)
 
+        if server_entity.id is None:
+            raise ValueError(f"Server '{server}' has no persisted ID")
+
         alert = ServerAlert(
             server_id=server_entity.id,
             severity=severity,
@@ -40,6 +43,12 @@ class AlertService:
 
             if server is None:
                 continue
+
+            if alert.id is None:
+                raise ValueError("Persisted alert has no ID")
+
+            if alert.created_at is None:
+                raise ValueError(f"Alert {alert.id} has no creation timestamp")
 
             result.append(
                 AlertView(
