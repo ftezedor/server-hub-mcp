@@ -194,6 +194,7 @@ def test_alert_service_creates_and_lists_active_alerts():
     assert alert.severity is AlertSeverity.CRITICAL
     assert service.active()[0].server == "web-server-01"
 
+    assert alert.id is not None
     assert service.resolve(alert.id) is True
     assert service.active() == []
 

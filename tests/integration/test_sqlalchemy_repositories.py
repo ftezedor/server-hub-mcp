@@ -31,36 +31,56 @@ def test_sqlalchemy_repositories_round_trip_and_cascade_cleanup():
             disk_gb=100,
         )
     )
+
     assert server.id is not None
-    assert servers.find_by_name("test-server").id == server.id
-    assert servers.find_by_ip("10.0.0.1").id == server.id
+    server_id = server.id
+
+    server_by_name = servers.find_by_name("test-server")
+    assert server_by_name is not None
+    assert server_by_name.id == server_id
+
+    server_by_ip = servers.find_by_ip("10.0.0.1")
+    assert server_by_ip is not None
+    assert server_by_ip.id == server_id
 
     metric = metrics.save(
         ServerMetrics(
-            server_id=server.id,
+            server_id=server_id,
             cpu_usage_percent=50,
             memory_usage_percent=40,
             disk_usage_percent=30,
             uptime_seconds=100,
         )
     )
-    assert metrics.find_latest(server.id).id == metric.id
-    assert metrics.find_history(server.id, 10) == [metric]
+
+    latest_metric = metrics.find_latest(server_id)
+    assert latest_metric is not None
+    assert latest_metric.id == metric.id
+
+    assert metrics.find_history(server_id, 10) == [metric]
 
     alert = alerts.save(
         ServerAlert(
-            server_id=server.id,
+            server_id=server_id,
             severity=AlertSeverity.WARNING,
             message="test",
         )
     )
-    assert alerts.find_active()[0].id == alert.id
-    assert alerts.resolve(alert.id) is True
+
+    active_alerts = alerts.find_active()
+    assert active_alerts
+    assert active_alerts[0].id == alert.id
+
+    assert alert.id is not None
+    alert_id = alert.id
+
+    assert alerts.resolve(alert_id) is True
     assert alerts.find_active() == []
 
-    servers.delete(server.id)
-    assert servers.find_by_id(server.id) is None
-    assert metrics.find_history(server.id) == []
+    servers.delete(server_id)
+
+    assert servers.find_by_id(server_id) is None
+    assert metrics.find_history(server_id) == []
     assert alerts.find_active() == []
 
     session.close()

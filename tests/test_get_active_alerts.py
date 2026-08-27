@@ -24,6 +24,7 @@ def test_active_alerts_use_server_reference_from_backend():
 
     assert result.count == 1
     alert = result.alerts[0]
+    assert alert.server is not None
     assert alert.server.name == "web-server-01"
     assert alert.server.ip == "192.168.1.10"
     assert alert.severity == "critical"

@@ -263,3 +263,135 @@ async def test_prompts_are_discoverable(mcp_client):
         prompts = await mcp_client.list_prompts()
 
     assert prompts is not None
+
+
+async def test_server_resources_are_discoverable(mcp_client):
+    async with mcp_client:
+        resources = await mcp_client.list_resources()
+        templates = await mcp_client.list_resource_templates()
+
+    resource_uris = {
+        str(resource.uri)
+        for resource in resources
+    }
+
+    template_uris = {
+        template.uriTemplate
+        for template in templates
+    }
+
+    assert "servers://active" in resource_uris
+    assert "system://stats" in resource_uris
+
+    assert "server://{server}/details" in template_uris
+    assert "server://{server}/metrics" in template_uris
+    assert "server://{server}/alerts" in template_uris
+
+
+async def test_read_server_details_resource(mcp_client):
+    async with mcp_client:
+        result = await mcp_client.read_resource(
+            "server://web-server-01/details"
+        )
+
+    payload = result_payload(result)
+
+    assert "web-server-01" in str(payload)
+    assert "192.168.1.10" in str(payload)
+    assert "status" in str(payload)
+
+
+async def test_read_server_metrics_resource(mcp_client):
+    async with mcp_client:
+        result = await mcp_client.read_resource(
+            "server://web-server-01/metrics"
+        )
+
+    payload = result_payload(result)
+
+    assert "web-server-01" in str(payload)
+    assert "metrics" in str(payload)
+    assert "count" in str(payload)
+
+
+async def test_read_server_alerts_resource(mcp_client):
+    async with mcp_client:
+        result = await mcp_client.read_resource(
+            "server://web-server-01/alerts"
+        )
+
+    payload = result_payload(result)
+
+    assert "web-server-01" in str(payload)
+    assert "alerts" in str(payload)
+    assert "count" in str(payload)
+
+
+async def test_server_details_resource_rejects_unknown_server(mcp_client):
+    async with mcp_client:
+        with pytest.raises(Exception):
+            await mcp_client.read_resource(
+                "server://does-not-exist/details"
+            )
+
+
+async def test_server_metrics_resource_rejects_unknown_server(mcp_client):
+    async with mcp_client:
+        with pytest.raises(Exception):
+            await mcp_client.read_resource(
+                "server://does-not-exist/metrics"
+            )
+
+
+async def test_server_alerts_resource_rejects_unknown_server(mcp_client):
+    async with mcp_client:
+        with pytest.raises(Exception):
+            await mcp_client.read_resource(
+                "server://does-not-exist/alerts"
+            )
+
+
+async def test_server_details_resource(mcp_client):
+    async with mcp_client:
+        result = await mcp_client.read_resource(
+            "server://web-server-01/details"
+        )
+
+    assert "web-server-01" in str(result)
+    assert "192.168.1.10" in str(result)
+
+
+async def test_server_details_resource_does_not_expose_internal_id(
+    mcp_client,
+):
+    async with mcp_client:
+        result = await mcp_client.read_resource(
+            "server://web-server-01/details"
+        )
+
+    payload = result_payload(result)
+
+    assert '"id"' not in str(payload)
+
+
+async def test_active_servers_resource(mcp_client):
+    async with mcp_client:
+        result = await mcp_client.read_resource(
+            "servers://active"
+        )
+
+    payload = result_payload(result)
+
+    assert "servers" in str(payload)
+    assert "count" in str(payload)
+
+
+async def test_system_stats_resource(mcp_client):
+    async with mcp_client:
+        result = await mcp_client.read_resource(
+            "system://stats"
+        )
+
+    payload = result_payload(result)
+
+    assert "servers" in str(payload)

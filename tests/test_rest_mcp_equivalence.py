@@ -17,7 +17,8 @@ import asyncio
 import json
 import os
 import uuid
-from typing import Any
+
+from typing import Any, Generator
 
 import httpx
 import pytest
@@ -36,7 +37,7 @@ TIMEOUT = float(os.getenv("SERVER_HUB_TEST_TIMEOUT", "10"))
 
 
 @pytest.fixture(scope="module")
-def api() -> httpx.Client:
+def api() -> Generator[httpx.Client, None, None]:
     with httpx.Client(base_url=API_URL, timeout=TIMEOUT) as client:
         yield client
 
