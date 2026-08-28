@@ -408,6 +408,7 @@ $("ask").addEventListener("click", async () => {
   $("activity").innerHTML = "<p>Waiting for tool activity...</p>";
   resetCommunicationLog();
   addCommunicationStep("Asking LLM");
+  $("executionSummary").classList.add("hidden");
 
   try {
     const messages = [

@@ -42,8 +42,52 @@
 </div>
 </section>
 <section class="card playground"><div class="heading"><div><small>PLAYGROUND</small><h2>Ask the MCP-enabled LLM</h2></div><span class="live">● LIVE</span></div>
-<div class="example-prompts">
-<span class="example-label">Examples</span>
+<div><span class="example-label">Predefined questions. Click to ask</span></div>
+  <div class="example-prompts">
+<!-- <span class="example-label">Examples</span> -->
+  <button type="button" class="example-button" class="quick-prompt quick-prompt-primary"
+        data-prompt="Perform a production health review. Check server status, recent metrics, and active alerts. Summarize the top issues and recommend which ones should be investigated first.">
+  ⭐ Production review
+  </button>
+  <button type="button" class="example-button" class="quick-prompt"
+          data-prompt="Which production servers require immediate attention? Consider server status, recent metrics, and active alerts.">
+    Production attention
+  </button>
+
+  <button type="button" class="example-button" class="quick-prompt"
+          data-prompt="Which production servers have critical alerts, and what are their current server conditions?">
+    Critical alerts
+  </button>
+
+  <button type="button" class="example-button" class="quick-prompt"
+          data-prompt="Which servers currently have the worst performance metrics? Explain why.">
+    Performance hotspots
+  </button>
+
+  <button type="button" class="example-button" class="quick-prompt"
+          data-prompt="Which servers show a worsening CPU trend based on their recent metrics?">
+    CPU trends
+  </button>
+
+  <button type="button" class="example-button" class="quick-prompt"
+          data-prompt="Which servers show increasing memory usage based on their recent metrics?">
+    Memory pressure
+  </button>
+
+  <button type="button" class="example-button" class="quick-prompt"
+          data-prompt="Find production servers with active alerts and correlate the alerts with their recent metrics. Identify which alerts are supported by the observed metrics.">
+    Correlate issues
+  </button>
+
+  <button type="button" class="example-button" class="quick-prompt"
+          data-prompt="Perform a production health review. Check server status, recent metrics, and active alerts. Summarize the top issues and recommend which ones should be investigated first.">
+    Production review
+  </button>
+
+  <button type="button" class="example-button" class="quick-prompt"
+          data-prompt="Give me an overview of the current server environment, including server count, environments, statuses, and active alerts.">
+    System overview
+  </button>
 <button type="button" class="example-button" data-prompt="Check web-server-02 and tell me its current status, latest metrics, and whether it has any active alerts.">Server health</button>
 <button type="button" class="example-button" data-prompt="Compare web-server-01 and web-server-02. Include their configuration, current metrics, and any active alerts.">Compare servers</button>
 <button type="button" class="example-button" data-prompt="Find all production servers, identify the ones requiring attention, and explain why based on their current metrics and active alerts.">Production attention</button>
