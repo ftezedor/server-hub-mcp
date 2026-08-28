@@ -7,6 +7,28 @@ Server Hub is a Python service that exposes server-management and operational da
 
 Both interfaces are intended to expose the same underlying application capabilities rather than duplicate business logic.
 
+## See MCP orchestration in action
+
+The MCP Playground makes the interaction between an LLM and MCP visible.
+
+In this example, the user asks the LLM to identify production servers
+requiring attention. The LLM discovers and invokes MCP tools, receives their
+results, reasons over the returned information, and continues the
+conversation until it can produce the final analysis.
+
+The Playground exposes the entire process in real time, including:
+
+- LLM ↔ MCP communication
+- Tool discovery and invocation
+- Tool inputs and results
+- Iterative LLM/tool execution
+- Per-operation timing
+- Final LLM response
+- Execution summary
+
+<!-- Upload playground.mp4 to GitHub and replace this URL -->
+https://github.com/user-attachments/assets/237aa741-6063-49be-b4b3-5fe50bc24773
+
 ## Architecture
 
 ```mermaid
