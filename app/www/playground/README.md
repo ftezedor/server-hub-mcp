@@ -1,42 +1,106 @@
-# MCP Playground — v0.2
+# MCP Playground v0.4
 
-A browser-based MCP test client.
+v0.4 keeps the LLM → MCP → LLM flow from v0.3 and improves presentation.
 
-## v0.2 scope
+- Modern responsive UI with connection indicators.
+- Separate LLM and MCP configuration cards.
+- Cleaner prompt/assistant experience.
+- MCP tools displayed as compact cards.
+- MCP calls displayed as a trace with arguments and results.
+- Collapsible protocol log.
+- Lightweight client-side Markdown rendering, including Markdown tables.
+- Stronger system guidance asking the LLM to present tool results clearly and use tables for tabular data.
 
-This version adds the first real MCP capability:
+The orchestration model remains intentionally small: one LLM tool call followed by one final LLM response.
 
-1. Configure an OpenAI-compatible LLM endpoint.
-2. Test the LLM connection.
-3. Configure an MCP Streamable HTTP endpoint.
-4. Establish an MCP session.
-5. Initialize the MCP client.
-6. Call `tools/list`.
-7. Display the tools advertised by the server.
 
-The LLM and MCP connections are intentionally independent.
+## v0.5 UX
 
-## Running
+- LLM and MCP configuration cards can be collapsed.
+- Collapsed cards show the connected model name and discovered MCP tool count.
+- The Ask workflow displays a live communication trace directly below the prompt.
+- The v0.4 visual design remains the baseline.
 
-```bash
-npm install
-npm run dev
-```
 
-Open the URL shown by Vite.
+## v0.5.1
 
-For the Server Hub MCP project, use:
+- Fixed the assistant response panel: it is now made visible when Ask is clicked.
+- The final LLM response is rendered below the communication trace using the
+  existing Markdown/table renderer.
 
-```text
-http://localhost:8000/mcp
-```
 
-## Important browser requirement
+## v0.5.2
 
-Because this is a browser client, the MCP server must allow the SPA origin through CORS. The LLM provider must also permit browser requests.
+- Fixed the assistant response visibility bug: the final LLM response is now
+  explicitly revealed when Ask starts and when the final response arrives.
+- Added the Playground version to the top-right corner.
+- LLM configuration automatically collapses after a successful connection.
+- MCP configuration automatically collapses after a successful connection.
+- Collapsed cards expose an Edit button so configuration can be changed later.
+- The connected model name and MCP tool count remain visible while collapsed.
 
-The API key remains in browser memory and is not persisted by this application.
 
-## Next
+## v0.5.3
 
-v0.3 can connect the LLM and MCP together: advertise the discovered MCP tools to the LLM, process tool calls, execute them through MCP, and return the results to the LLM.
+- Replaced the text-based Hide/Edit controls with a compact chevron disclosure
+  control.
+- The control changes direction when the card is collapsed or expanded.
+- Added accessible `aria-label` and tooltip text for the control.
+
+
+## v0.5.4 UX
+
+- Expanded LLM/MCP cards no longer display a collapse button.
+- Collapsed cards expose only a small, discrete Edit action.
+- The Playground version is displayed immediately after the product name in
+  the top-left header.
+
+
+## v0.5.4 UI fix
+
+- Corrected an extra closing `div` in the configuration grid markup.
+- This restores the Playground and lower sections to the centered `.shell`
+  layout instead of allowing the Playground card to span the viewport.
+- Footer version is now consistent with the header (`v0.5.4`).
+
+
+## v0.6.0 MCP orchestration
+
+- MCP tool calling is now iterative instead of one-shot.
+- Every LLM turn receives the discovered MCP tool definitions.
+- Tool results are returned with their matching `tool_call_id`.
+- Multiple sequential tool calls are supported, up to 12 rounds.
+- The communication trace records each tool request, response, and LLM turn.
+
+
+## v0.7.0 Playground demo UX
+
+- Added one-click example prompts for server health, server comparison, and
+  production-server attention analysis.
+- Added a compact MCP execution summary showing tools called, LLM turns,
+  MCP operations, and total elapsed time.
+- Added timing to LLM and MCP tool-call trace entries.
+
+
+## v0.7.1 fixes
+
+- Corrected the visible Playground version to v0.7.1.
+- Fixed one-click example prompt handlers.
+- Added delegated click handling so example buttons remain functional if
+  their surrounding DOM is rebuilt.
+
+
+## v0.7.2 trace timing
+
+- Shows measured elapsed time for every LLM response.
+- Shows measured elapsed time for every MCP tool execution.
+- Keeps orchestration markers untimed to avoid misleading measurements.
+- Keeps the execution summary's total wall-clock duration.
+
+
+## v0.7.3 fix
+
+- Fixed the orchestration timing counters so they are initialized in the
+  correct request scope.
+- LLM and MCP operation durations are now displayed reliably.
+- Execution summary is updated after the final LLM response.
