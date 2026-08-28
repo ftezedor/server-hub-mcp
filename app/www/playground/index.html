@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCP Playground</title>
+  <link rel="stylesheet" href="/playground/style.css">
+</head>
+<body>
+  <main>
+    <header>
+      <h1>MCP Playground</h1>
+      <p>v0.2 — connect to Server Hub MCP and discover its tools.</p>
+    </header>
+
+    <section class="grid">
+      <div class="card">
+        <h2>LLM</h2>
+        <label>Provider
+          <select id="provider">
+            <option value="custom">OpenAI-compatible</option>
+            <!-- <option value="groq">Groq</option>
+            <option value="openai">OpenAI</option>
+            <option value="together">Together AI</option>
+            <option value="openrouter">OpenRouter</option>
+            <option value="ollama">Ollama</option>
+            <option value="roteia">Roteia</option> -->
+          </select>
+        </label>
+        <label>Base URL
+          <input id="baseUrl" placeholder="https://api.groq.com/openai/v1">
+        </label>
+        <label>API Key
+          <input id="apiKey" type="password" autocomplete="off">
+        </label>
+        <label>Model
+          <input id="model" placeholder="llama-3.3-70b-versatile">
+        </label>
+        <button id="llmConnect">Connect LLM</button>
+        <p id="llmStatus" class="status"></p>
+      </div>
+
+      <div class="card">
+        <h2>MCP Server</h2>
+        <label>MCP URL
+          <input id="mcpUrl" value="/mcp">
+        </label>
+        <button id="mcpConnect">Connect MCP</button>
+        <p id="mcpStatus" class="status"></p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Discovered Tools <span id="toolCount"></span></h2>
+      <div id="tools" class="tools">
+        <p>Connect to MCP to discover tools.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Protocol Log</h2>
+      <pre id="log">Ready.</pre>
+    </section>
+
+    <footer>
+      <small>
+        v0.2 establishes the MCP session and lists tools.
+        Tool execution and LLM/MCP orchestration come later.
+      </small>
+    </footer>
+  </main>
+  <script src="/playground/app.js"></script>
+</body>
+</html>
