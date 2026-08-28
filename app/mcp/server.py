@@ -7,6 +7,8 @@ directly; both implementations satisfy the same client port.
 
 from __future__ import annotations
 
+from app.mcp.playground import register_playground_routes
+
 import json
 import os
 from typing import Annotated, Any, Literal, cast
@@ -36,6 +38,8 @@ from app.mcp.ports import ServerHubClient
 
 
 mcp = FastMCP("Server Hub")
+
+register_playground_routes(mcp)
 
 VALID_SEVERITIES = {"critical", "warning", "info"}
 
