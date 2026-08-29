@@ -12,13 +12,13 @@
         <div class="brand">
           <div class="mark">M</div>
           <div>
-            <h1>MCP Playground <span class="brand-version">v0.7.4</span></h1>
+            <h1>MCP Playground <span class="brand-version">v0.7.7</span></h1>
             <p>Explore LLMs through Model Context Protocol</p>
           </div>
         </div>
         <div class="topbar-right">
-          <!--sdiv class="pills"><span id="llmPill" class="pill"><i></i>LLM</span><span id="mcpPill" class="pill"><i></i>MCP</span></div-->
         </div>
+        <button id="exportMarkdown" type="button" class="floating-export-button" hidden><span aria-hidden="true">↓</span><span>Export Run</span></button>
       </header>
       <main>
         <section class="grid">
@@ -110,7 +110,6 @@
             >
           </div>
           <div class="example-prompts">
-            <!-- <span class="example-label">Examples</span> -->
             <button
               type="button"
               class="example-button"
@@ -173,15 +172,6 @@
               Correlate issues
             </button>
 
-            <!--button
-              type="button"
-              class="example-button"
-              class="quick-prompt"
-              data-prompt="Perform a production health review. Check server status, recent metrics, and active alerts. Summarize the top issues and recommend which ones should be investigated first."
-            >
-              Production review
-            </button-->
-
             <button
               type="button"
               class="example-button"
@@ -231,21 +221,40 @@
             <div class="execution-summary-title">MCP EXECUTION</div>
             <div class="execution-summary-stats">
               <div>
-                <strong id="summaryToolCount">0</strong
-                ><span>tools called</span>
+                <strong id="summaryToolCount">0</strong><span>tools called</span>
               </div>
               <div>
                 <strong id="summaryLlmTurns">0</strong><span>LLM turns</span>
               </div>
               <div>
-                <strong id="summaryOperations">0</strong
-                ><span>MCP operations</span>
+                <strong id="summaryOperations">0</strong><span>MCP operations</span>
               </div>
               <div>
                 <strong id="summaryLlmTokens">—</strong><span>LLM tokens</span>
               </div>
               <div>
+                <strong id="summaryLlmCost">—</strong><span>LLM cost</span>
+              </div>
+              <div>
                 <strong id="summaryDuration">0 ms</strong><span>total</span>
+              </div>
+            </div>
+          </div>
+          <div id="mcpPerformance" class="execution-summary hidden">
+            <div class="execution-summary-title">MCP PERFORMANCE</div>
+            <div class="execution-summary-stats mcp-performance-stats">
+              <div>
+                <strong id="summaryMcpTotal">—</strong
+                ><span>total MCP time</span>
+              </div>
+              <div>
+                <strong id="summaryMcpAverage">—</strong><span>average</span>
+              </div>
+              <div>
+                <strong id="summaryMcpFastest">—</strong><span>fastest</span>
+              </div>
+              <div>
+                <strong id="summaryMcpSlowest">—</strong><span>slowest</span>
               </div>
             </div>
           </div>
@@ -282,7 +291,7 @@
           <pre id="log">Ready.</pre>
         </details>
       </main>
-      <footer><span>MCP Playground</span><span>v0.7.4</span></footer>
+      <footer><span>MCP Playground</span><span>v0.7.7</span></footer>
     </div>
     <script src="/playground/app.js"></script>
   </body>
