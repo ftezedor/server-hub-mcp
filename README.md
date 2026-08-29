@@ -120,7 +120,8 @@ For complete documentation, configuration, usage, and implementation details, se
 
 The following video demonstrates the Playground in action, showing an LLM interacting with the MCP server through tool discovery and execution:
 
-https://github.com/user-attachments/assets/237aa741-6063-49be-b4b3-5fe50bc24773
+<!-- https://github.com/user-attachments/assets/237aa741-6063-49be-b4b3-5fe50bc24773 -->
+https://github.com/user-attachments/assets/97d4fb0d-9989-4ad6-a072-119335ba26d0
 
 ---
 

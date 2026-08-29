@@ -1,6 +1,7 @@
 # MCP Playground v0.7.7
 
-https://github.com/user-attachments/assets/237aa741-6063-49be-b4b3-5fe50bc24773
+<!-- https://github.com/user-attachments/assets/237aa741-6063-49be-b4b3-5fe50bc24773 -->
+https://github.com/user-attachments/assets/97d4fb0d-9989-4ad6-a072-119335ba26d0
 
 MCP Playground is a lightweight browser-based interface for exploring interactions between a Large Language Model (LLM) and tools exposed through the Model Context Protocol (MCP).
 
