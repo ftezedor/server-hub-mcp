@@ -1,111 +1,289 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MCP Playground</title><link rel="stylesheet" href="/playground/style.css">
-</head>
-<body>
-<div class="shell">
-<header class="topbar"><div class="brand"><div class="mark">M</div><div><h1>MCP Playground <span class="brand-version">v0.7.3</span></h1><p>Explore LLMs through Model Context Protocol</p></div></div><div class="topbar-right"><div class="pills"><span id="llmPill" class="pill"><i></i>LLM</span><span id="mcpPill" class="pill"><i></i>MCP</span></div></div></header>
-<main>
-<section class="grid">
-<div class="card config-card" id="llmCard">
-  <div class="config-header">
-    <div class="heading">
-      <div><small>MODEL</small><h2>LLM Connection</h2></div><b>01</b>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MCP Playground</title>
+    <link rel="stylesheet" href="/playground/style.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="mark">M</div>
+          <div>
+            <h1>MCP Playground <span class="brand-version">v0.7.4</span></h1>
+            <p>Explore LLMs through Model Context Protocol</p>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <!--sdiv class="pills"><span id="llmPill" class="pill"><i></i>LLM</span><span id="mcpPill" class="pill"><i></i>MCP</span></div-->
+        </div>
+      </header>
+      <main>
+        <section class="grid">
+          <div class="card config-card" id="llmCard">
+            <div class="config-header">
+              <div class="heading">
+                <div>
+                  <small>MODEL</small>
+                  <h2>LLM Connection</h2>
+                </div>
+              </div>
+            </div>
+            <div id="llmConfigBody" class="collapsible-body">
+              <label>Provider<select id="provider"></select></label>
+              <label>Base URL<input id="baseUrl" /></label>
+              <label
+                >API Key<input id="apiKey" type="password" autocomplete="off"
+              /></label>
+              <label>Model<input id="model" /></label>
+              <button id="llmConnect" class="primary">Connect LLM</button>
+              <div id="llmStatus" class="status"></div>
+            </div>
+            <div id="llmSummary" class="collapsed-summary">
+              <span class="summary-dot"></span>
+              <div class="summary-content">
+                <small>CONNECTED MODEL</small
+                ><strong id="llmModelSummary">Not connected</strong>
+              </div>
+              <button
+                id="editLlm"
+                class="edit-button"
+                type="button"
+                aria-label="Edit LLM connection"
+              >
+                Edit
+              </button>
+            </div>
+          </div>
+          <div class="card config-card" id="mcpCard">
+            <div class="config-header">
+              <div class="heading">
+                <div>
+                  <small>PROTOCOL</small>
+                  <h2>MCP Connection</h2>
+                </div>
+              </div>
+            </div>
+            <div id="mcpConfigBody" class="collapsible-body">
+              <label>MCP URL<input id="mcpUrl" value="/mcp" /></label>
+              <div class="hint">
+                Connect to Server Hub and expose its tools to the selected LLM.
+              </div>
+              <button id="mcpConnect" class="primary">Connect MCP</button>
+              <div id="mcpStatus" class="status"></div>
+              <div class="count">
+                <strong id="toolCount">0</strong> tools discovered
+              </div>
+            </div>
+            <div id="mcpSummary" class="collapsed-summary">
+              <span class="summary-dot"></span>
+              <div class="summary-content">
+                <small>MCP TOOLS</small
+                ><strong
+                  ><span id="mcpToolsSummary">0</span> tools discovered</strong
+                >
+              </div>
+              <button
+                id="editMcp"
+                class="edit-button"
+                type="button"
+                aria-label="Edit MCP connection"
+              >
+                Edit
+              </button>
+            </div>
+          </div>
+        </section>
+        <section class="card playground">
+          <div class="heading">
+            <div>
+              <small>PLAYGROUND</small>
+              <h2>Ask the MCP-enabled LLM</h2>
+            </div>
+            <span class="live">● LIVE</span>
+          </div>
+          <div>
+            <span class="example-label"
+              >Predefined questions. Click to ask</span
+            >
+          </div>
+          <div class="example-prompts">
+            <!-- <span class="example-label">Examples</span> -->
+            <button
+              type="button"
+              class="example-button"
+              class="quick-prompt quick-prompt-primary"
+              data-prompt="Perform a production health review. Check server status, recent metrics, and active alerts. Summarize the top issues and recommend which ones should be investigated first."
+            >
+              ⭐ Production review
+            </button>
+            <button
+              type="button"
+              class="example-button"
+              class="quick-prompt"
+              data-prompt="Which production servers require immediate attention? Consider server status, recent metrics, and active alerts."
+            >
+              Production attention
+            </button>
+
+            <button
+              type="button"
+              class="example-button"
+              class="quick-prompt"
+              data-prompt="Which production servers have critical alerts, and what are their current server conditions?"
+            >
+              Critical alerts
+            </button>
+
+            <button
+              type="button"
+              class="example-button"
+              class="quick-prompt"
+              data-prompt="Which servers currently have the worst performance metrics? Explain why."
+            >
+              Performance hotspots
+            </button>
+
+            <button
+              type="button"
+              class="example-button"
+              class="quick-prompt"
+              data-prompt="Which servers show a worsening CPU trend based on their recent metrics?"
+            >
+              CPU trends
+            </button>
+
+            <button
+              type="button"
+              class="example-button"
+              class="quick-prompt"
+              data-prompt="Which servers show increasing memory usage based on their recent metrics?"
+            >
+              Memory pressure
+            </button>
+
+            <button
+              type="button"
+              class="example-button"
+              class="quick-prompt"
+              data-prompt="Find production servers with active alerts and correlate the alerts with their recent metrics. Identify which alerts are supported by the observed metrics."
+            >
+              Correlate issues
+            </button>
+
+            <!--button
+              type="button"
+              class="example-button"
+              class="quick-prompt"
+              data-prompt="Perform a production health review. Check server status, recent metrics, and active alerts. Summarize the top issues and recommend which ones should be investigated first."
+            >
+              Production review
+            </button-->
+
+            <button
+              type="button"
+              class="example-button"
+              class="quick-prompt"
+              data-prompt="Give me an overview of the current server environment, including server count, environments, statuses, and active alerts."
+            >
+              System overview
+            </button>
+            <button
+              type="button"
+              class="example-button"
+              data-prompt="Check web-server-02 and tell me its current status, latest metrics, and whether it has any active alerts."
+            >
+              Server health
+            </button>
+            <button
+              type="button"
+              class="example-button"
+              data-prompt="Compare web-server-01 and web-server-02. Include their configuration, current metrics, and any active alerts."
+            >
+              Compare servers
+            </button>
+            <button
+              type="button"
+              class="example-button"
+              data-prompt="Find all production servers, identify the ones requiring attention, and explain why based on their current metrics and active alerts."
+            >
+              Production attention
+            </button>
+          </div>
+          <div class="prompt">
+            <textarea
+              id="prompt"
+              placeholder="Try: What are the latest metrics for web-server-02?"
+            ></textarea
+            ><button id="ask" disabled>Ask <span>→</span></button>
+          </div>
+          <div id="communicationLog" class="communication-log hidden">
+            <small>LLM COMMUNICATION</small>
+            <div id="communicationSteps"></div>
+          </div>
+          <div id="answerPanel" class="answer-panel hidden">
+            <small>ASSISTANT</small>
+            <div id="answer" class="answer"></div>
+          </div>
+          <div id="executionSummary" class="execution-summary hidden">
+            <div class="execution-summary-title">MCP EXECUTION</div>
+            <div class="execution-summary-stats">
+              <div>
+                <strong id="summaryToolCount">0</strong
+                ><span>tools called</span>
+              </div>
+              <div>
+                <strong id="summaryLlmTurns">0</strong><span>LLM turns</span>
+              </div>
+              <div>
+                <strong id="summaryOperations">0</strong
+                ><span>MCP operations</span>
+              </div>
+              <div>
+                <strong id="summaryLlmTokens">—</strong><span>LLM tokens</span>
+              </div>
+              <div>
+                <strong id="summaryDuration">0 ms</strong><span>total</span>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="grid">
+          <div class="card">
+            <div class="heading compact">
+              <div>
+                <small>MCP</small>
+                <h2>Discovered Tools</h2>
+              </div>
+              <em id="toolCountBadge">0</em>
+            </div>
+            <div id="tools" class="tools">
+              <div class="empty">Connect to MCP to discover tools.</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="heading compact">
+              <div>
+                <small>TRACE</small>
+                <h2>MCP Activity</h2>
+              </div>
+            </div>
+            <div id="activity" class="activity">
+              <div class="empty">Tool activity will appear here.</div>
+            </div>
+          </div>
+        </section>
+        <details class="card log">
+          <summary>
+            <span>DEBUG &nbsp; Protocol Log</span><span>⌄</span>
+          </summary>
+          <pre id="log">Ready.</pre>
+        </details>
+      </main>
+      <footer><span>MCP Playground</span><span>v0.7.4</span></footer>
     </div>
-  </div>
-  <div id="llmConfigBody" class="collapsible-body">
-    <label>Provider<select id="provider"></select></label>
-    <label>Base URL<input id="baseUrl"></label>
-    <label>API Key<input id="apiKey" type="password" autocomplete="off"></label>
-    <label>Model<input id="model"></label>
-    <button id="llmConnect" class="primary">Connect LLM</button>
-    <div id="llmStatus" class="status"></div>
-  </div>
-  <div id="llmSummary" class="collapsed-summary"><span class="summary-dot"></span><div class="summary-content"><small>CONNECTED MODEL</small><strong id="llmModelSummary">Not connected</strong></div><button id="editLlm" class="edit-button" type="button" aria-label="Edit LLM connection">Edit</button></div>
-</div>
-<div class="card config-card" id="mcpCard">
-  <div class="config-header">
-    <div class="heading">
-      <div><small>PROTOCOL</small><h2>MCP Connection</h2></div><b>02</b>
-    </div>
-  </div>
-  <div id="mcpConfigBody" class="collapsible-body">
-    <label>MCP URL<input id="mcpUrl" value="/mcp"></label>
-    <div class="hint">Connect to Server Hub and expose its tools to the selected LLM.</div>
-    <button id="mcpConnect" class="primary">Connect MCP</button>
-    <div id="mcpStatus" class="status"></div>
-    <div class="count"><strong id="toolCount">0</strong> tools discovered</div>
-  </div>
-  <div id="mcpSummary" class="collapsed-summary"><span class="summary-dot"></span><div class="summary-content"><small>MCP TOOLS</small><strong><span id="mcpToolsSummary">0</span> tools discovered</strong></div><button id="editMcp" class="edit-button" type="button" aria-label="Edit MCP connection">Edit</button></div>
-</div>
-</section>
-<section class="card playground"><div class="heading"><div><small>PLAYGROUND</small><h2>Ask the MCP-enabled LLM</h2></div><span class="live">● LIVE</span></div>
-<div><span class="example-label">Predefined questions. Click to ask</span></div>
-  <div class="example-prompts">
-<!-- <span class="example-label">Examples</span> -->
-  <button type="button" class="example-button" class="quick-prompt quick-prompt-primary"
-        data-prompt="Perform a production health review. Check server status, recent metrics, and active alerts. Summarize the top issues and recommend which ones should be investigated first.">
-  ⭐ Production review
-  </button>
-  <button type="button" class="example-button" class="quick-prompt"
-          data-prompt="Which production servers require immediate attention? Consider server status, recent metrics, and active alerts.">
-    Production attention
-  </button>
-
-  <button type="button" class="example-button" class="quick-prompt"
-          data-prompt="Which production servers have critical alerts, and what are their current server conditions?">
-    Critical alerts
-  </button>
-
-  <button type="button" class="example-button" class="quick-prompt"
-          data-prompt="Which servers currently have the worst performance metrics? Explain why.">
-    Performance hotspots
-  </button>
-
-  <button type="button" class="example-button" class="quick-prompt"
-          data-prompt="Which servers show a worsening CPU trend based on their recent metrics?">
-    CPU trends
-  </button>
-
-  <button type="button" class="example-button" class="quick-prompt"
-          data-prompt="Which servers show increasing memory usage based on their recent metrics?">
-    Memory pressure
-  </button>
-
-  <button type="button" class="example-button" class="quick-prompt"
-          data-prompt="Find production servers with active alerts and correlate the alerts with their recent metrics. Identify which alerts are supported by the observed metrics.">
-    Correlate issues
-  </button>
-
-  <button type="button" class="example-button" class="quick-prompt"
-          data-prompt="Perform a production health review. Check server status, recent metrics, and active alerts. Summarize the top issues and recommend which ones should be investigated first.">
-    Production review
-  </button>
-
-  <button type="button" class="example-button" class="quick-prompt"
-          data-prompt="Give me an overview of the current server environment, including server count, environments, statuses, and active alerts.">
-    System overview
-  </button>
-<button type="button" class="example-button" data-prompt="Check web-server-02 and tell me its current status, latest metrics, and whether it has any active alerts.">Server health</button>
-<button type="button" class="example-button" data-prompt="Compare web-server-01 and web-server-02. Include their configuration, current metrics, and any active alerts.">Compare servers</button>
-<button type="button" class="example-button" data-prompt="Find all production servers, identify the ones requiring attention, and explain why based on their current metrics and active alerts.">Production attention</button>
-</div>
-<div class="prompt"><textarea id="prompt" placeholder="Try: What are the latest metrics for web-server-02?"></textarea><button id="ask" disabled>Ask <span>→</span></button></div>
-<div id="communicationLog" class="communication-log hidden"><small>LLM COMMUNICATION</small><div id="communicationSteps"></div></div>
-<div id="answerPanel" class="answer-panel hidden"><small>ASSISTANT</small><div id="answer" class="answer"></div></div>
-<div id="executionSummary" class="execution-summary hidden">
-  <div class="execution-summary-title">MCP EXECUTION</div>
-  <div class="execution-summary-stats">
-    <div><strong id="summaryToolCount">0</strong><span>tools called</span></div>
-    <div><strong id="summaryLlmTurns">0</strong><span>LLM turns</span></div>
-    <div><strong id="summaryOperations">0</strong><span>MCP operations</span></div>
-    <div><strong id="summaryDuration">0 ms</strong><span>total</span></div>
-  </div>
-</div></section>
-<section class="grid"><div class="card"><div class="heading compact"><div><small>MCP</small><h2>Discovered Tools</h2></div><em id="toolCountBadge">0</em></div><div id="tools" class="tools"><div class="empty">Connect to MCP to discover tools.</div></div></div>
-<div class="card"><div class="heading compact"><div><small>TRACE</small><h2>MCP Activity</h2></div></div><div id="activity" class="activity"><div class="empty">Tool activity will appear here.</div></div></div></section>
-<details class="card log"><summary><span>DEBUG &nbsp; Protocol Log</span><span>⌄</span></summary><pre id="log">Ready.</pre></details>
-</main><footer><span>MCP Playground</span><span>v0.7.3</span></footer></div>
-<script src="/playground/app.js"></script></body></html>
+    <script src="/playground/app.js"></script>
+  </body>
+</html>
