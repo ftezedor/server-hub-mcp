@@ -10,6 +10,7 @@ from sqlalchemy.engine import CursorResult
 
 class SQLAlchemyServerRepository:
     def __init__(self, session: Session):
+        
         self.session = session
 
     def find_by_id(self, server_id: int) -> Server | None:
@@ -27,7 +28,7 @@ class SQLAlchemyServerRepository:
     def search(self, query: str) -> list[Server]:
         pattern = f"%{query}%"
         stmt = select(ServerModel).where(
-            (ServerModel.name.ilike(pattern)) | ServerModel.ip.ilike(pattern)
+            (ServerModel.name.ilike(pattern)) | ServerModel.ip.ilike(pattern) | ServerModel.environment.ilike(pattern) | ServerModel.status.ilike(pattern)
         ).order_by(ServerModel.name)
         return [to_server(m) for m in self.session.scalars(stmt)]
 
