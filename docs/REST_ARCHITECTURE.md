@@ -78,7 +78,7 @@ Repository protocols define what persistence can do without prescribing how it d
 SQLite is selected by default with:
 
 ```text
-DATABASE_URL=sqlite:///./servers.db
+DATABASE_URL=sqlite:////tmp/servers.db
 ```
 
 A different SQLAlchemy-compatible relational database can be selected with its corresponding URL and driver.
