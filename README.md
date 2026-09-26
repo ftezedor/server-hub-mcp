@@ -179,6 +179,12 @@ python -m venv .venv
 source .venv/bin/activate
 ```
 
+Preload the database
+
+```bash
+python app/api/init_db.py 
+```
+
 Install the project with test dependencies:
 
 ```bash
