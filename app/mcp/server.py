@@ -262,8 +262,11 @@ def system_stats_resource() -> str:
 
 @mcp.tool()
 def search_servers(query: str) -> SearchServersResponse:
-    """Search for servers by partial name or IP address.
+    """Search for servers by partial name, IP address, environment, or status.
 
+    valid environments: production, homology, testing, staging, development
+    valid statuses: online, offline, maintenance
+    
     Use a meaningful search term. Empty queries and "*" are not supported.
     Returns lightweight summaries with name, IP, environment, and status.
     Use get_server when detailed information about one exact server is needed.
@@ -298,6 +301,32 @@ def get_server(server: str) -> ServerDetails:
             client.get_server_by_id(resolved.id)
         )
     )
+
+
+@mcp.tool()
+def get_servers_metrics(
+    servers: list[str],
+    limit: Annotated[int, Field(ge=1, le=50)] = 10,
+) -> list[GetServerMetricsResponse]:
+    """Get recent metric history for multiple servers.
+
+    servers argument is a list of server names or IP addresses. ex: ["server1", "server2"]
+    limit specifies the number of metric records to return and must be 1-50.
+    """
+
+    print("servers:", servers)
+
+    if not 1 <= limit <= 50:
+        raise ValueError("limit must be between 1 and 50")
+
+    metrics: list[GetServerMetricsResponse] = []
+
+    for server in servers:
+        metrics.append(
+            get_server_metrics(server, limit)
+        )
+
+    return metrics
 
 
 @mcp.tool()
