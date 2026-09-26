@@ -16,6 +16,7 @@ def list_alerts(dep=Depends(services)):
 
 @router.post("", response_model=dict, status_code=status.HTTP_201_CREATED)
 def create_alert_endpoint(payload: AlertCreate, dep=Depends(services)):
+    
     alert = dep["alerts"].create(
         server=payload.server,
         severity=payload.severity,
