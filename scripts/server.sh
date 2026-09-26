@@ -9,7 +9,8 @@
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 PROJECT_DIR=$(dirname "$SCRIPT_DIR")
 PYTHONPATH="$PROJECT_DIR:$PYTHONPATH"
-VENV_DIR="$PROJECT_DIR/venv"
+VENV_DIR="$PROJECT_DIR/.venv"
+[[ -d "$PROJECT_DIR/.venv" && ! -d "$VENV_DIR" ]] && VENV_DIR="$PROJECT_DIR/venv"
 PID_DIR="/tmp/mcp-hub"
 
 API_PID_FILE="$PID_DIR/api.pid"
