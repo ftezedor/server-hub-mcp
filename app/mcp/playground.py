@@ -18,9 +18,9 @@ PLAYGROUND_DIR = (
     Path(__file__).resolve().parents[2] / "app" / "www" / "playground"
 )
 
-print("========================")
-print(PLAYGROUND_DIR)
-print("========================")
+# print("========================")
+# print(PLAYGROUND_DIR)
+# print("========================")
 
 def register_playground_routes(mcp: FastMCP) -> None:
     """Register the static Playground without changing MCP transport setup."""
