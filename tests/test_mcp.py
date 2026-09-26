@@ -98,14 +98,15 @@ async def test_all_six_tools_are_registered(mcp_client):
     expected = {
         "search_servers",
         "get_server",
+        "get_servers_metrics",
         "get_server_metrics",
         "get_active_alerts",
         "get_system_stats",
         "create_alert",
     }
 
-    assert expected <= names
-    assert len(names) == 6
+    assert expected == names
+    assert len(names) == 7
 
 
 async def test_search_servers(mcp_client):
