@@ -67,7 +67,7 @@ def get_server(server_id: int, dep=Depends(services)):
 @router.post("", response_model=dict, status_code=status.HTTP_201_CREATED)
 def create_server_endpoint(payload: ServerCreate, service: ServerService = Depends(server_service)):
     server = service.create_server(Server(**payload.model_dump()))
-    return {"id": server.id, "message": f"Servidor '{server.name}' criado com sucesso"}
+    return {"id": server.id, "message": f"Server '{server.name}' added successfully"}
 
 
 @router.put("/{server_id}/status", response_model=dict)
@@ -77,11 +77,11 @@ def update_status(
     service: ServerService = Depends(server_service),
 ):
     server = service.update_status(server_id, server_status)
-    return {"message": f"Status atualizado para '{server.status.value}'", "server_id": server.id}
+    return {"message": f"Status updated to '{server.status.value}'", "server_id": server.id}
 
 
 @router.delete("/{server_id}", response_model=dict)
 def delete_server_endpoint(server_id: int, service: ServerService = Depends(server_service)):
     server = service.get_server(server_id)
     service.delete_server(server_id)
-    return {"message": f"Servidor '{server.name}' removido com sucesso"}
+    return {"message": f"Server '{server.name}' deleted successfully"}
