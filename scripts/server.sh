@@ -164,7 +164,9 @@ mcp_start() {
     cd "$PROJECT_DIR" || return 1
     source "$VENV_DIR/bin/activate" || return 1
     
-    export SERVER_HUB_MCP_BACKEND="application"
+    if [ -z "$SERVER_HUB_MCP_BACKEND" ]; then
+        export SERVER_HUB_MCP_BACKEND="application"
+    fi
 
     nohup python3.12 ./app/mcp/http_server.py --host 0.0.0.0 --port $MCP_PORT >> "$MCP_LOG" 2>&1 &
     local pid=$!
